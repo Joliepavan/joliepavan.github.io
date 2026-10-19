@@ -1,9 +1,32 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Mail, Sparkles, ArrowUpRight, Brain, Code2, MapPin } from 'lucide-react';
-import { personalInfo, projectsData, experiencesData } from '@/data/portfolio';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  MapPin,
+  ArrowUpRight,
+  Copy,
+  Check,
+  Sparkles,
+  BookOpen,
+  Briefcase,
+  Layers,
+  Send,
+  ExternalLink,
+  Code2,
+  Terminal,
+  Cpu
+} from 'lucide-react';
+import {
+  Locale,
+  personalInfo,
+  aboutData,
+  resumeData,
+  projectsData,
+  contactData
+} from '@/data/portfolio';
+
+type TabKey = 'about' | 'resume' | 'projects' | 'contact';
 
 function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -22,233 +45,516 @@ function LinkedinIcon({ className = "w-4 h-4" }: { className?: string }) {
 }
 
 export default function Home() {
+  const [locale, setLocale] = useState<Locale>('pt');
+  const [activeTab, setActiveTab] = useState<TabKey>('about');
+  const [copied, setCopied] = useState(false);
+
+  const tabs: { key: TabKey; label: { pt: string; en: string }; icon: React.ReactNode }[] = [
+    { key: 'about', label: { pt: 'Sobre', en: 'About' }, icon: <Sparkles className="w-4 h-4" /> },
+    { key: 'resume', label: { pt: 'Currículo', en: 'Resume' }, icon: <Briefcase className="w-4 h-4" /> },
+    { key: 'projects', label: { pt: 'Projetos', en: 'Projects' }, icon: <Layers className="w-4 h-4" /> },
+    { key: 'contact', label: { pt: 'Contato', en: 'Contact Me' }, icon: <Send className="w-4 h-4" /> },
+  ];
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(contactData.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div className="min-h-screen bg-[#08080a] text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-300 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-[#f7f8fa] text-[#0b0f19] selection:bg-[#4338ca]/10 selection:text-[#4338ca] pb-24">
       
-      {/* Luz ambiente / Background Radial Gradient estilo Bryan Szero */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-indigo-600/15 via-purple-600/10 to-transparent blur-[120px] pointer-events-none -z-10" />
+      {/* Top Bar with Glass Language Toggle */}
+      <div className="max-w-3xl mx-auto px-4 pt-6 sm:pt-10 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>{personalInfo.status[locale]}</span>
+        </div>
 
-      {/* Floating Header com vidro fosco */}
-      <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl">
-        <nav className="flex items-center justify-between px-6 py-3 rounded-full bg-zinc-900/60 backdrop-blur-md border border-white/10 shadow-2xl">
-          <a href="#" className="font-bold tracking-tight text-sm text-white flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            jolie.dev
-          </a>
-          <div className="flex items-center gap-6 text-xs font-medium text-zinc-400">
-            <a href="#about" className="hover:text-white transition-colors">Sobre</a>
-            <a href="#projects" className="hover:text-white transition-colors">Projetos</a>
-            <a href="#experience" className="hover:text-white transition-colors">Trajetória</a>
-          </div>
-          <div className="flex items-center gap-2">
-            <a
-              href={personalInfo.socialLinks.github}
-              target="_blank"
-              rel="noreferrer"
-              className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors border border-white/10"
-              title="GitHub"
-            >
-              <GithubIcon className="w-4 h-4" />
-            </a>
-            <a
-              href={personalInfo.socialLinks.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 text-sky-400 transition-colors border border-white/10"
-              title="LinkedIn"
-            >
-              <LinkedinIcon className="w-4 h-4" />
-            </a>
-          </div>
-        </nav>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-6 pt-36 pb-24 space-y-24">
-        
-        {/* HERO SECTION / SOBRE */}
-        <section id="about" className="space-y-6 pt-8 scroll-mt-36">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium"
+        {/* Glass Language Toggle */}
+        <div className="glass-pill p-1 rounded-full shadow-sm flex items-center gap-1 border border-zinc-200/80">
+          <button
+            onClick={() => setLocale('pt')}
+            className={`relative px-3 py-1 text-xs font-semibold rounded-full transition-colors ${
+              locale === 'pt' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-700'
+            }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            {personalInfo.role}
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.1]"
-          >
-            Construindo soluções com <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-sky-400">código limpo</span> e Inteligência Artificial.
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-base sm:text-lg text-zinc-400 max-w-2xl font-normal leading-relaxed"
-          >
-            {personalInfo.bio}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-            className="flex items-center gap-2 text-xs font-mono text-zinc-500"
-          >
-            <MapPin className="w-3.5 h-3.5 text-indigo-400" />
-            <span>{personalInfo.location}</span>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-wrap items-center gap-4 pt-2"
-          >
-            <a
-              href={personalInfo.socialLinks.github}
-              target="_blank"
-              rel="noreferrer"
-              className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-all flex items-center gap-2 shadow-lg shadow-white/5"
-            >
-              <GithubIcon className="w-4 h-4" /> GitHub
-            </a>
-            <a
-              href={personalInfo.socialLinks.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 font-semibold text-sm transition-all flex items-center gap-2"
-            >
-              <LinkedinIcon className="w-4 h-4 text-sky-400" /> LinkedIn
-            </a>
-            <a
-              href={personalInfo.socialLinks.email}
-              className="px-5 py-2.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-white/5 font-semibold text-sm transition-all flex items-center gap-2"
-            >
-              <Mail className="w-4 h-4" /> Email
-            </a>
-          </motion.div>
-        </section>
-
-        {/* BENTO GRID DE PROJETOS */}
-        <section id="projects" className="space-y-8 scroll-mt-28">
-          <div>
-            <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-              <Code2 className="w-6 h-6 text-indigo-400" />
-              Projetos em Destaque
-            </h2>
-            <p className="text-zinc-400 text-sm">Laboratório de ideias, plataformas e ferramentas abertas.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {projectsData.map((project, idx) => (
+            {locale === 'pt' && (
               <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.1 }}
-                className={`group relative p-6 rounded-2xl bg-zinc-900/40 border border-white/5 hover:border-white/20 transition-all duration-300 flex flex-col justify-between hover:shadow-2xl hover:shadow-indigo-500/5 ${project.colSpan || ''}`}
+                layoutId="langPill"
+                className="absolute inset-0 bg-white rounded-full shadow-sm"
+                transition={{ type: 'spring', stiffness: 450, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">PT</span>
+          </button>
+
+          <button
+            onClick={() => setLocale('en')}
+            className={`relative px-3 py-1 text-xs font-semibold rounded-full transition-colors ${
+              locale === 'en' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-700'
+            }`}
+          >
+            {locale === 'en' && (
+              <motion.div
+                layoutId="langPill"
+                className="absolute inset-0 bg-white rounded-full shadow-sm"
+                transition={{ type: 'spring', stiffness: 450, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">EN</span>
+          </button>
+        </div>
+      </div>
+
+      <main className="max-w-3xl mx-auto px-4 pt-6 space-y-6">
+        
+        {/* PROFILE HEADER CARD (Estilo Tabfolio) */}
+        <header className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-200/80 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              {/* Monogram Avatar with Tabfolio subtle styling */}
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100/60 border border-indigo-200/60 flex items-center justify-center text-indigo-700 font-bold text-xl tracking-tight shadow-sm">
+                JP
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900">
+                    {personalInfo.name}
+                  </h1>
+                </div>
+                <p className="text-sm font-medium text-zinc-500">
+                  {personalInfo.role[locale]}
+                </p>
+                <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                  <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>{personalInfo.location}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex items-center gap-2 self-start sm:self-center">
+              <a
+                href={personalInfo.socialLinks.github}
+                target="_blank"
+                rel="noreferrer"
+                className="p-2.5 rounded-xl border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-all shadow-sm"
+                title="GitHub"
+              >
+                <GithubIcon className="w-4 h-4" />
+              </a>
+              <a
+                href={personalInfo.socialLinks.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                className="p-2.5 rounded-xl border border-zinc-200 text-zinc-600 hover:text-sky-600 hover:bg-zinc-50 transition-all shadow-sm"
+                title="LinkedIn"
+              >
+                <LinkedinIcon className="w-4 h-4" />
+              </a>
+              <button
+                onClick={handleCopyEmail}
+                className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs flex items-center gap-2 transition-all shadow-sm"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copied ? (locale === 'pt' ? 'Copiado!' : 'Copied!') : (locale === 'pt' ? 'Copiar Email' : 'Copy Email')}</span>
+              </button>
+            </div>
+          </div>
+
+          <p className="text-sm text-zinc-600 leading-relaxed pt-1">
+            {personalInfo.tagline[locale]}
+          </p>
+        </header>
+
+        {/* SEGMENTED TAB NAVIGATION (Order: About, Resume, Projects, Contact Me) */}
+        <nav className="bg-zinc-200/60 p-1.5 rounded-2xl border border-zinc-200 flex items-center gap-1">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`relative flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
+                  isActive ? 'text-zinc-900' : 'text-zinc-500 hover:text-zinc-800'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTabPill"
+                    className="absolute inset-0 bg-white rounded-xl shadow-sm border border-zinc-200/60"
+                    transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-1.5">
+                  {tab.icon}
+                  {tab.label[locale]}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* TAB CONTENT WITH ANIMATION */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-200/80 shadow-sm min-h-[460px]">
+          <AnimatePresence mode="wait">
+            
+            {/* 1. ABOUT TAB */}
+            {activeTab === 'about' && (
+              <motion.div
+                key="about"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-8"
               >
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono text-indigo-400 font-medium px-2.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20">
-                      {project.status}
-                    </span>
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-zinc-500 group-hover:text-white transition-colors"
-                        title="Ver no GitHub"
-                      >
-                        <ArrowUpRight className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                      </a>
-                    )}
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">
-                      {project.title}
-                    </h3>
-                    <p className="text-xs text-zinc-400 font-medium mt-0.5">{project.tagline}</p>
-                  </div>
-
-                  <p className="text-sm text-zinc-400 leading-relaxed">
-                    {project.description}
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900">
+                    {aboutData.greeting[locale]}
+                  </h2>
+                  <p className="text-sm sm:text-base font-medium text-zinc-700 leading-relaxed">
+                    {aboutData.headline[locale]}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 pt-6">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 text-[11px] font-mono text-zinc-400 rounded bg-white/5 border border-white/5"
-                    >
-                      {tag}
-                    </span>
+                <div className="space-y-4 text-sm text-zinc-600 leading-relaxed border-t border-zinc-100 pt-6">
+                  {aboutData.paragraphs.map((p, idx) => (
+                    <p key={idx}>{p[locale]}</p>
                   ))}
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
 
-        {/* TRAJETÓRIA E ATUAÇÃO */}
-        <section id="experience" className="space-y-8 scroll-mt-28">
-          <div>
-            <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-              <Brain className="w-6 h-6 text-purple-400" />
-              Trajetória & Atuação
-            </h2>
-            <p className="text-zinc-400 text-sm">Pesquisa acadêmica, liderança comunitária e desenvolvimento público.</p>
-          </div>
-
-          <div className="space-y-4">
-            {experiencesData.map((exp, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.1 }}
-                className="p-6 rounded-2xl bg-zinc-900/30 border border-white/5 hover:border-white/15 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-base font-bold text-white">{exp.role}</h3>
-                    {exp.badge && (
-                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                        {exp.badge}
+                {/* What I'm into right now */}
+                <div className="space-y-3 pt-2 border-t border-zinc-100">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    {aboutData.interestsTitle[locale]}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {aboutData.interests.map((item, idx) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1.5 text-xs font-medium bg-zinc-50 border border-zinc-200/80 text-zinc-700 rounded-lg hover:border-zinc-300 transition-colors"
+                      >
+                        {item}
                       </span>
-                    )}
+                    ))}
                   </div>
-                  <p className="text-sm text-zinc-400">{exp.company}</p>
-                  <p className="text-xs text-zinc-500 pt-1">{exp.description}</p>
                 </div>
-                <div className="text-xs font-mono text-zinc-500 whitespace-nowrap">
-                  {exp.period}
+
+                {/* The values behind my work */}
+                <div className="space-y-4 pt-2 border-t border-zinc-100">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    {aboutData.valuesTitle[locale]}
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {aboutData.values.map((val, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-2xl bg-zinc-50/70 border border-zinc-200/70 space-y-1.5"
+                      >
+                        <h4 className="text-sm font-bold text-zinc-900">
+                          {val.title[locale]}
+                        </h4>
+                        <p className="text-xs text-zinc-500 leading-relaxed">
+                          {val.desc[locale]}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
-            ))}
-          </div>
-        </section>
+            )}
+
+            {/* 2. RESUME TAB */}
+            {activeTab === 'resume' && (
+              <motion.div
+                key="resume"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-8"
+              >
+                {/* Experiences */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    {resumeData.experienceTitle[locale]}
+                  </h3>
+
+                  <div className="space-y-4">
+                    {resumeData.experiences.map((exp, idx) => (
+                      <div
+                        key={idx}
+                        className="p-5 rounded-2xl bg-zinc-50/80 border border-zinc-200/70 space-y-3 hover:border-zinc-300 transition-colors"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-zinc-900">
+                              {exp.role[locale]}
+                            </h4>
+                            {exp.tag && (
+                              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200/60">
+                                {exp.tag}
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-xs font-mono text-zinc-500">
+                            {exp.period[locale]}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs text-zinc-500">
+                          <span className="font-medium text-zinc-700">{exp.company}</span>
+                          {exp.location && <span>• {exp.location}</span>}
+                        </div>
+
+                        <ul className="space-y-1.5 pt-1 text-xs text-zinc-600 list-disc list-inside">
+                          {exp.bullets.map((b, bIdx) => (
+                            <li key={bIdx} className="leading-relaxed">
+                              {b[locale]}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Education */}
+                <div className="space-y-3 pt-2 border-t border-zinc-100">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    {resumeData.educationTitle[locale]}
+                  </h3>
+
+                  {resumeData.education.map((edu, idx) => (
+                    <div
+                      key={idx}
+                      className="p-5 rounded-2xl bg-zinc-50/80 border border-zinc-200/70 space-y-2"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <h4 className="text-sm font-bold text-zinc-900">
+                          {edu.degree[locale]}
+                        </h4>
+                        <span className="text-xs font-mono text-zinc-500">
+                          {edu.period}
+                        </span>
+                      </div>
+                      <p className="text-xs font-medium text-zinc-700">
+                        {edu.institution}
+                      </p>
+                      <p className="text-xs text-zinc-500 leading-relaxed">
+                        {edu.details[locale]}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Tools & Technologies */}
+                <div className="space-y-3 pt-2 border-t border-zinc-100">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    {resumeData.toolsTitle[locale]}
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {resumeData.tools.map((cat, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-2xl bg-zinc-50/70 border border-zinc-200/70 space-y-2.5"
+                      >
+                        <h4 className="text-xs font-bold text-zinc-800">
+                          {cat.category[locale]}
+                        </h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {cat.items.map((tool, tIdx) => (
+                            <span
+                              key={tIdx}
+                              className="px-2 py-0.5 text-[11px] font-medium bg-white border border-zinc-200 text-zinc-700 rounded-md shadow-2xs"
+                            >
+                              {tool}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* 3. PROJECTS TAB */}
+            {activeTab === 'projects' && (
+              <motion.div
+                key="projects"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-4"
+              >
+                {projectsData.map((project) => (
+                  <div
+                    key={project.id}
+                    className="group p-5 sm:p-6 rounded-2xl bg-zinc-50/70 border border-zinc-200/70 hover:border-zinc-300 hover:bg-zinc-50 transition-all space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-medium text-zinc-400">
+                          {project.year}
+                        </span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200/50">
+                          {project.status[locale]}
+                        </span>
+                      </div>
+
+                      {project.githubUrl && (
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-zinc-400 group-hover:text-zinc-900 transition-colors p-1"
+                          title="GitHub"
+                        >
+                          <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </a>
+                      )}
+                    </div>
+
+                    <div>
+                      <h4 className="text-base font-bold text-zinc-900 group-hover:text-indigo-600 transition-colors">
+                        {project.title}
+                      </h4>
+                      <p className="text-xs font-medium text-zinc-500 mt-0.5">
+                        {project.tagline[locale]}
+                      </p>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                      {project.description[locale]}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1.5 pt-2">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-0.5 text-[11px] font-mono text-zinc-600 rounded bg-white border border-zinc-200/80 shadow-2xs"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+
+            {/* 4. CONTACT ME TAB */}
+            {activeTab === 'contact' && (
+              <motion.div
+                key="contact"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-6"
+              >
+                <div className="space-y-2">
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900">
+                    {contactData.headline[locale]}
+                  </h3>
+                  <p className="text-sm text-zinc-600 leading-relaxed">
+                    {contactData.subheadline[locale]}
+                  </p>
+                </div>
+
+                {/* Email Direct Action Card */}
+                <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                      Email
+                    </span>
+                    <p className="text-base font-bold text-zinc-900 font-mono">
+                      {contactData.email}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleCopyEmail}
+                      className="px-4 py-2.5 rounded-xl bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 text-xs font-semibold flex items-center gap-2 transition-all shadow-sm"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copied ? (locale === 'pt' ? 'Copiado!' : 'Copied!') : (locale === 'pt' ? 'Copiar' : 'Copy')}</span>
+                    </button>
+
+                    <a
+                      href={`mailto:${contactData.email}`}
+                      className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-sm"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>{locale === 'pt' ? 'Enviar Mensagem' : 'Send Message'}</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Social Networks Grid */}
+                <div className="space-y-3 pt-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    {locale === 'pt' ? 'Redes & Conexões' : 'Social & Connect'}
+                  </span>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <a
+                      href={personalInfo.socialLinks.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="p-4 rounded-2xl bg-zinc-50/70 border border-zinc-200/70 hover:border-zinc-300 hover:bg-zinc-50 transition-all flex items-center justify-between group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-white border border-zinc-200 text-zinc-700 shadow-2xs">
+                          <GithubIcon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-zinc-900">GitHub</p>
+                          <p className="text-xs text-zinc-500">github.com/Joliepavan</p>
+                        </div>
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </a>
+
+                    <a
+                      href={personalInfo.socialLinks.linkedin}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="p-4 rounded-2xl bg-zinc-50/70 border border-zinc-200/70 hover:border-zinc-300 hover:bg-zinc-50 transition-all flex items-center justify-between group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-white border border-zinc-200 text-sky-600 shadow-2xs">
+                          <LinkedinIcon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-zinc-900">LinkedIn</p>
+                          <p className="text-xs text-zinc-500">linkedin.com/in/jolielopes</p>
+                        </div>
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+          </AnimatePresence>
+        </div>
 
         {/* FOOTER */}
-        <footer className="pt-12 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <p>© 2026 Jolie Lopes Pavan. Goiânia, Brasil.</p>
-          <div className="flex items-center gap-4">
-            <a href={personalInfo.socialLinks.github} target="_blank" rel="noreferrer" className="hover:text-zinc-300 transition-colors">GitHub</a>
-            <a href={personalInfo.socialLinks.linkedin} target="_blank" rel="noreferrer" className="hover:text-zinc-300 transition-colors">LinkedIn</a>
-            <a href={personalInfo.socialLinks.email} className="hover:text-zinc-300 transition-colors">Contato</a>
-          </div>
+        <footer className="text-center text-xs text-zinc-400 py-6 space-y-1">
+          <p>© 2026 Jolie Lopes Pavan • Goiânia, Brasil</p>
+          <p className="text-[11px] text-zinc-400">
+            {locale === 'pt' ? 'Inspirado na arquitetura limpa de tabfolio' : 'Inspired by the clean architecture of tabfolio'}
+          </p>
         </footer>
 
       </main>
